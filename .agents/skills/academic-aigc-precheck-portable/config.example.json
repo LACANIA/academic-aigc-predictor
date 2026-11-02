@@ -1,0 +1,11 @@
+{
+  "schema_version": "portable-knowledge-1",
+  "root": null,
+  "cases_file": "cases.json",
+  "rules_file": "rules.md",
+  "cases_sha256": "REPLACE_WITH_LOCAL_CASES_SHA256",
+  "rules_sha256": "REPLACE_WITH_LOCAL_RULES_SHA256",
+  "known_titles": {},
+  "known_sources": {},
+  "engineering_test_only": false
+}

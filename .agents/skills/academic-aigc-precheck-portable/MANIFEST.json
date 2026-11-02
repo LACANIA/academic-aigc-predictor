@@ -1,0 +1,34 @@
+{
+  "release": "RC1-DOCX-PORTABLE-0.1.0",
+  "protocol": "practical-whole-document-0.1.0",
+  "files": {
+    "config.example.json": "b0e4faae3eacde101d68b4d4b449b72da74e2912646a19ecd1bbe3b4087a2174",
+    "INSTALL_WINDOWS.md": "3e2ee348ee74a9bbf2cb53cb8cabbb0683c85953aafc0f671df5f6462d2025cf",
+    "manage.py": "ffd8ba43fea376fc43d8b6d04e3e45b4abab51de853199f5bc0e9b899cb87901",
+    "references/docx-input.md": "4b064e909679d95de4364cfe713c3bbb6d699e4b7bbb99abb379c81ea18187fb",
+    "references/practical-prediction.md": "e7f409a8bea30bb84cfaa4754d7048c98bfd2f919e7836750212f27bf5b1222f",
+    "references/rc1-workflow.md": "99d7759e0d6f74e77ae52495fec9e42140f0b6d1907cd6d38bb3461644c45df1",
+    "requirements.txt": "36ab08d76cd8a1c0b0d54bf5b3757ad9ed867938bdd4ae701384a986ad59b31f",
+    "runtime/tap/__init__.py": "d1d7cb97fcacaf283cdd7e18bc51276097dab6677c27325628c27e60cdada0e6",
+    "runtime/tap/audit.py": "35783d41ef6e917c313323a26ff263db1c67a7d5ff867ca31e1ee9fa215f67cd",
+    "runtime/tap/behavior.py": "ee93d77a9afec65af82d8ce8d15aba86d9fdafaddfc333033a07fa87b5ea6ae4",
+    "runtime/tap/contrastive.py": "03a59b9fe5f1f0c7dff3d020880a03885e92dc94682fb75116d7f17731290d48",
+    "runtime/tap/docx_source.py": "2e58a94387a5e9914af9aae2bed19368df69821ddc7695eaf3505c528e838568",
+    "runtime/tap/docx_workflow.py": "d75d7d1b90f285088da88e04e41c9414e847c4864d8ec2ab82d77a82be59e316",
+    "runtime/tap/highlights.py": "edeaff65a213067b73b98a63d3dcd3d96886934ce761a19c424eb0904e9a5048",
+    "runtime/tap/knowledge.py": "d28093187921a61f7b8ae4554d5f187e3930fcd02fce34bc3a905aeb2724bb2c",
+    "runtime/tap/layout.py": "50982f2c51f248d0eff8463842d8b6bd653c42dc59232303b83290b049715d3b",
+    "runtime/tap/practical.py": "da1bd2db0f2e0cf43a07342f3a836e916a3ce67cc35cfc1b90de04c432edc684",
+    "runtime/tap/practical_workflow.py": "9faa6b6e2195870329763baa74da08bbf18c526414e44f175dcc30c6a1a6e7e2",
+    "runtime/tap/precheck.py": "7349d7d583016b61f4697af4a0bee27d53455a6ced3b809c4daffa770a2d4a31",
+    "runtime/tap/tex_source.py": "f85c67889e00f0c548992ac1d341240c08c6fc9bb07267ced40635ffd54d124b",
+    "scripts/precheck.py": "6723d420ba0efc1cc1bb55a6298552a0b03c554cf363c40fe2dff049b1d920d0",
+    "SKILL.md": "6cf758d8cc8795717ce9bea26ef82e745f93caf44a504b04acd09d6d0cbcf376"
+  },
+  "requires": {
+    "python": ">=3.11",
+    "PyMuPDF": ">=1.24,<2"
+  },
+  "private_knowledge_included": false,
+  "score_method_changed": false
+}
