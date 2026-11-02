@@ -73,11 +73,10 @@ Python 负责解析、版本核对、输入准备和报告校验；宿主 LLM �
 
 ### 1. 准备环境与获取代码
 
-需要 Python **3.11 及以上**、PyMuPDF **>=1.24,<2**。DOCX、TeX、JSON 和报告处理使用 Python 标准库，无需安装 Word 或 TeX 编译器。通过 GitHub CLI 获取仓库时，还需要 Git、已登录的 `gh` 和仓库访问权限；当前仓库为 Private。
+需要 Python **3.11 及以上**、PyMuPDF **>=1.24,<2**。DOCX、TeX、JSON 和报告处理使用 Python 标准库，无需安装 Word 或 TeX 编译器。仓库现公开提供源码和安装包，下面使用 Git 克隆，无需 GitHub 登录。
 
 ```powershell
-gh auth status
-gh repo clone LACANIA/academic-aigc-predictor
+git clone https://github.com/LACANIA/academic-aigc-predictor.git
 Set-Location academic-aigc-predictor
 
 $repoDir = (Get-Location).Path
@@ -228,7 +227,7 @@ PDF 的双栏与公式可能影响阅读顺序，TeX 与 PDF 可能存在版本�
 
 解析脚本在本地处理用户明确提供的文件，不自动上传到额外检测服务，也不搜索其他论文或报告。宿主 LLM 会接收获准进入对话上下文的正文，仍适用宿主服务的数据政策。请将论文、检测报告、私有案例、knowledge 配置和预检输出保存在仓库之外。
 
-本项目为非官方工具，与 Turnitin 没有官方隶属关系。目前仓库为 Private，尚未指定开源许可证；代码访问权限不等同于论文、正式报告或私有知识的再分发授权。
+本项目为非官方工具，与 Turnitin 没有官方隶属关系。仓库为 Public，尚未指定开源许可证；代码访问权限不等同于论文、正式报告或私有知识的再分发授权。
 
 ## 常见问题与卸载
 
