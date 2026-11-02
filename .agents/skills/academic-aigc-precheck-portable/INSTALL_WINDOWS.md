@@ -1,5 +1,11 @@
 # Windows独立安装与使用
 
+## 0.2.0：本地知识库构建
+
+本版本增加 [本地建库流程](references/local-knowledge.md)，内置公开的七条规则，不分发原35例私有案例。安装后先运行 `scripts/precheck.py knowledge init --output <新私有目录>`，再通过 `knowledge import` 明确提供论文、对应报告和家族标识；`--render` 可生成复核页面。完成实际页面复核并提交 decisions 后，运行 `knowledge build` 和 `knowledge verify`，生成可供 prepare 使用的本机 knowledge.json。空库不能运行完整预检，没有自动训练或百分比校准。
+
+0.2.0 安装包与原 build02 分开保存，manage.py 仅接受本版本包。已有同名安装时先校验与备份，不能直接覆盖；原安装器可在确认内容未修改后卸载，私有知识不删除，再使用新包安装。本次公开发布没有自动更新任何用户原安装。
+
 ## 运行条件
 
 Python 3.11及以上、PyMuPDF>=1.24,<2。DOCX静态解析、TeX读取、JSON和报告生成使用Python标准库；不需要Word、TeX编译器、OCR、外部检测服务或额外模型API。宿主Codex负责阅读全文及给出实验性判断，Python没有独立AI分类器。建议使用虚拟环境。

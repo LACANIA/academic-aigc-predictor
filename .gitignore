@@ -11,3 +11,4 @@ data/
 outputs/
 logs/
 .portable-install.json
+.pytest_cache/

@@ -4,16 +4,22 @@ from pathlib import Path
 sys.dont_write_bytecode=True
 SKILL=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(SKILL/'runtime'))
-VERSION='RC1-DOCX-PORTABLE-0.1.0'
+VERSION='RC1-DOCX-PORTABLE-0.2.0'
 
 def main():
     parser=argparse.ArgumentParser();sub=parser.add_subparsers(dest='command',required=True)
     sub.add_parser('doctor')
+    kb=sub.add_parser('knowledge')
+    from tap.knowledge_builder import configure_parser
+    configure_parser(kb)
     a=sub.add_parser('prepare');g=a.add_mutually_exclusive_group(required=True);g.add_argument('--pdf');g.add_argument('--docx')
     a.add_argument('--tex');a.add_argument('--history');a.add_argument('--family',required=True);a.add_argument('--knowledge',required=True)
     a.add_argument('--threshold',type=float);a.add_argument('--engineering-test',action='store_true');a.add_argument('--output',required=True)
     a=sub.add_parser('finish');a.add_argument('--packet',required=True);a.add_argument('--prediction',required=True);a.add_argument('--output',required=True)
     args=parser.parse_args()
+    if args.command=='knowledge':
+        from tap.knowledge_builder import run
+        print(json.dumps(run(args),ensure_ascii=False,indent=2));return 0
     import tap.docx_workflow as workflow
     from tap import practical
     from tap.precheck import canonical_hash

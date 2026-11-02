@@ -6,17 +6,15 @@
 
 目前已经实现可安装的 Skill、PDF / TeX / DOCX 解析、历史版本差分、全文分析输入和 Markdown 报告生成。接近官方检测表现是持续验证的研发目标，当前预测仍有明显误差，不能保证正式检测只需一次或一定达到某个阈值。预测比例表示对检测行为的研究性估计，不表示论文真实由 AI 生成的比例。
 
-## 当前发布状态：七条规则已公开，真实案例库待补齐
+## 当前版本：0.2.0 已支持本地知识库构建
 
-**当前仓库已提供程序、Skill、预测协议、配置模板和[七条通用经验规则](docs/turnitin-behavior-rules.md)，尚未提供可直接使用的真实案例库及完整知识配置，下载安装后还不能直接完成完整预检。** `config.example.json` 只是配置模板。
+**现在可以下载安装后，用自己的论文和对应 Turnitin 报告建立本地知识库，再用于后续论文预检。** 本版本提供初始化、配对导入、页面复核、案例生成和配置校验五个命令，并内置公开的七条通用经验规则。构建过程在本地进行，不需要把论文、报告或案例上传本仓库。
 
-七条规则公开的是通用观察、反例和适用边界，没有论文原文、公式、实验结果或完整检测报告。文件中的 E01 等编号对应未公开的历史证据索引，读者暂时无法通过本仓库复核这些具体案例；不能将其当作已经跨论文验证的规律。
+本版本没有预装原35例私有案例，也不提供一套已校准的公共案例库。没有历史资料时，可以安装和初始化，但空库不能运行完整预检。导入只产生待复核候选，用户或宿主必须实际核对版本及报告页面，确认后才能加入案例；无法确认时保留未知或跳过。不能将所有候选自动接受以绕过空库限制。
 
-目前使用者仍需准备有授权、版本对应的真实论文与 Turnitin 报告，将可追溯的高亮及未高亮案例整理为现有接口要求的本地案例文件，结合公开规则填写路径和 SHA-256 配置。已有兼容且有授权的知识库可以直接配置使用。原35例私有案例、未发表论文和完整检测报告继续保留在本地。
+这里的“建库”是整理可追溯的检测观测，没有训练独立模型权重，不会自动提高或校准百分比。后续仍计划补充经过授权与审查的公共真实案例。当前几何提取沿用固定 cyan 矢量 profile，扫描报告、其他颜色和部分模板可能无法可靠识别；版本匹配或标签不明确时应停止或保留不确定性。
 
-当前没有自动导入任意论文或报告、自动学习或自动校准功能。仅将文件放入文件夹，不会生成有效知识库或自动改变模型判断；自行整理的知识也不能直接视为与原私有知识版具有相同效果。字段与约束见下文“配置检测经验”和安装包内的 `INSTALL_WINDOWS.md`。
-
-**后续计划基于允许分享相应摘录与标签的公开论文、真实检测报告和社区授权贡献，逐步补齐可分发案例库、整理与导入指引，以及默认配置加载流程，目标是下载即可预检。** 这些内容尚未交付；增加案例不等于完成准确性校准。
+规则原文见[七条经验规则](docs/turnitin-behavior-rules.md)；其中 E01 等私有证据编号暂未公开，规则仍为有限样本假设。[本地建库完整说明](.agents/skills/academic-aigc-precheck-portable/references/local-knowledge.md)解释复核字段、证据和限制。原0.1.0 ZIP 与版本标签继续保留，0.2.0 使用新的独立包。
 
 ## 使用流程
 
@@ -49,7 +47,7 @@
 | 重点区域 | 输出原文摘录、章节、判断依据、反例和不确定因素 |
 | 报告生成 | 校验输入绑定与引文，生成 `PRECHECK_REPORT.md` |
 
-当前发布包为 `RC1-DOCX-PORTABLE-0.1.0`，内置协议为 `practical-whole-document-0.1.0`。目前通过 Codex Skill 调用，Skill 名称保持为 `academic-aigc-precheck-portable`；仓库名称不限定宿主，其他宿主适配与验收单独开展。
+当前发布包为 `RC1-DOCX-PORTABLE-0.2.0`，内置协议为 `practical-whole-document-0.1.0`。目前通过 Codex Skill 调用，Skill 名称保持为 `academic-aigc-precheck-portable`；仓库名称不限定宿主，其他宿主适配与验收单独开展。
 
 ## 工程结构
 
@@ -63,10 +61,13 @@ academic-aigc-predictor/
 │   ├── config.example.json         # 私有知识配置模板
 │   ├── MANIFEST.json               # 文件校验清单
 │   ├── references/                 # 全文协议与输入说明
-│   ├── scripts/precheck.py         # doctor / prepare / finish
+│   ├── scripts/precheck.py         # doctor / knowledge / prepare / finish
 │   └── runtime/tap/                # 解析、知识读取及报告模块
+├── docs/                          # 公开七条规则
+├── tests/                         # 合成本地建库测试
+├── requirements-dev.txt           # 可选测试依赖
 └── dist/
-    └── academic-aigc-precheck-RC1-DOCX-PORTABLE-build02.zip
+    └── academic-aigc-precheck-portable-0.2.0.zip
 ```
 
 Python 负责解析、版本核对、输入准备和报告校验；宿主 LLM 负责全文分析与预测。`prepare` 不产生检测百分比，`finish` 也不会自行调用一个检测模型。工程没有训练独立分类器，不调用额外付费模型 API 或 Turnitin 在线接口；宿主自身的订阅、额度或服务费用仍适用。
@@ -83,7 +84,7 @@ Set-Location academic-aigc-predictor
 
 $repoDir = (Get-Location).Path
 $skillSource = Join-Path $repoDir '.agents\skills\academic-aigc-precheck-portable'
-$bundle = Join-Path $repoDir 'dist\academic-aigc-precheck-RC1-DOCX-PORTABLE-build02.zip'
+$bundle = Join-Path $repoDir 'dist\academic-aigc-precheck-portable-0.2.0.zip'
 py -3 --version
 ```
 
@@ -91,14 +92,14 @@ py -3 --version
 
 ### 2. 检查发布包并建立独立 Python 环境
 
-发布 ZIP 包含23个原始文件，SHA-256 应为：
+0.2.0 发布 ZIP 包含26个文件，SHA-256 应为：
 
 ```text
-5e0cb505f676fe93e19bfb406919c7cdf98ebac6392f91fda0966fd31a2ba5d5
+c622e5951201e8ea667fdf84b4925ec01402d30057f40656a9e062e43d0cd679
 ```
 
 ```powershell
-$expectedHash = '5e0cb505f676fe93e19bfb406919c7cdf98ebac6392f91fda0966fd31a2ba5d5'
+$expectedHash = 'c622e5951201e8ea667fdf84b4925ec01402d30057f40656a9e062e43d0cd679'
 $actualHash = (Get-FileHash -LiteralPath $bundle -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($actualHash -ne $expectedHash) { throw '发布包 SHA-256 不一致，请停止安装。' }
 
@@ -129,47 +130,46 @@ if ($LASTEXITCODE -ne 0) { throw 'Skill 安装失败。' }
 
 用户级安装位置为 `~/.agents/skills/academic-aigc-precheck-portable`，可在其他项目中使用，目录规则见 [OpenAI 官方 Skill 文档](https://learn.chatgpt.com/docs/build-skills)。如果界面没有显示新 Skill，可刷新或重新启动会话。请避免同时保留多个内容不同的同名 Skill。已有目录内容完全相同时可以校验后复用；存在用户修改时应完整备份。
 
-## 配置检测经验
+## 建立自己的本地知识库
 
-**完整预检仍需要有效的真实案例文件和本地配置。** 七条规则已作为仓库附加资料公开：[turnitin-behavior-rules.md](docs/turnitin-behavior-rules.md)。原冻结 ZIP 保持23个文件及原 SHA-256，不包含这份新发布的附加资料。原35例私有案例、论文原稿和正式检测报告未公开；缺少有效案例时，完整 `prepare` 仍会明确停止。
-
-### 配置 JSON 与本地知识库构建
-
-配置模板已经公开：[config.example.json](.agents/skills/academic-aigc-precheck-portable/config.example.json)。JSON 本身可以分享，它记录知识根目录、案例与规则文件位置和 SHA-256；模板不包含真实案例。每个人的实际配置应根据本机文件生成，不能沿用开发者电脑上的路径。
-
-当前尚不支持“新建文件夹，放入论文和对应报告后自动建立知识库”。已有本地解析、高亮分析和案例读取能力，但还缺少面向普通用户的统一导入入口、版本确认、标签提取与人工复核、案例格式转换、去重及配置生成流程。可以由 Codex 协助人工整理，但不能将这种人工流程描述成现成的一键功能。
-
-后续的本地知识库构建应保存可追溯的真实观测，继续调用宿主 LLM；它不涉及训练独立模型权重，也不自动保证预测已校准。跨宿主适配与完整导入流程需分别验收。
-
-将模板复制到安装目录和 Git 仓库以外的私有位置：
+安装后无需手工编写首次配置。使用已经安装依赖的 Python 初始化一个新私有目录，程序会复制公开规则并生成本机 knowledge.json。下面沿用前文的安装变量。
 
 ```powershell
-$configDir = Join-Path $env:USERPROFILE '.config\academic-aigc-predictor'
-New-Item -ItemType Directory -Path $configDir -Force | Out-Null
-$knowledgeConfig = Join-Path $configDir 'knowledge.json'
-if (Test-Path -LiteralPath $knowledgeConfig) { throw '知识配置已存在，请核对后复用。' }
-Copy-Item -LiteralPath (Join-Path $installedSkill 'config.example.json') -Destination $knowledgeConfig
+$cli = Join-Path $installedSkill 'scripts\precheck.py'
+$knowledgeRoot = Join-Path $env:USERPROFILE '.local\share\academic-aigc-predictor\knowledge'
+& $pythonEnv $cli knowledge init --output $knowledgeRoot
+& $pythonEnv $cli knowledge verify --workspace $knowledgeRoot
 ```
 
-可以将公开规则复制到自己选择的本地知识根目录，作为 `rules_file` 指向的文件，并计算它的 SHA-256。该公开文件当前 SHA-256 为 `aceb54bbf65bceb6a7920b2ca035a71aff811c4ef3b897c9fafd1dd66ffa3463`。案例文件仍需单独提供，不能用空列表、合成句子或未知标签填充以绕过校验。
+初始 ready_for_prepare=false 是正常状态。将论文与对应报告放在自己选择的本地资料文件夹，向 Codex 明确说明配对关系和家族标识；不要把最新待预测结果混入预检输入。脚本按明确路径处理一对文件，宿主只查看指定资料文件夹直属文件名，不递归搜索。
 
-按真实文件位置编辑配置，结构如下；示例中的路径和哈希需要替换，不能直接作为有效知识使用：
-
-```json
-{
-  "schema_version": "portable-knowledge-1",
-  "root": "<已授权本地知识根目录>",
-  "cases_file": "knowledge/cases.json",
-  "rules_file": "knowledge/rules.md",
-  "cases_sha256": "<案例文件实际SHA-256>",
-  "rules_sha256": "<规则文件实际SHA-256>",
-  "known_titles": {},
-  "known_sources": {},
-  "engineering_test_only": false
-}
+```powershell
+& $pythonEnv $cli knowledge import --workspace $knowledgeRoot --paper '<paper.pdf>' --report '<report.pdf>' --family '<confirmed-family>' --render
+# --paper 也可以是 DOCX；PDF 可另外提供 --tex '<main.tex>'。
 ```
 
-`cases_file`、`rules_file` 必须是 `root` 内部的相对路径。使用 `Get-FileHash -Algorithm SHA256` 计算真实哈希，并填入小写十六进制值。已有正式配置可直接复用。知识接口会检查文件身份、案例结构及七条规则卡片；缺失、路径越界或哈希不符时会拒绝读取，不能使用合成测试案例代替真实经验。不要将私有配置、知识文件、输入包或输出报告提交到本仓库。
+命令返回 import_id、REVIEW.md 和 review.template.json 路径；--render 生成报告正文页面图像。先查看真实页面和原文对应，再将模板另存为 review.json，填写实际复核者、同版本确认、明确接受/拒绝/跳过、真实标签、具体依据和页码。改变自动几何候选标签时，还需说明 geometry_override_reason；未核查的项目保持 skip。脚本记录复核声明，无法独立证明操作者确实看过页面，宿主不得虚构人工确认。
+
+```powershell
+& $pythonEnv $cli knowledge review --workspace $knowledgeRoot --decisions '<review.json>'
+& $pythonEnv $cli knowledge build --workspace $knowledgeRoot
+& $pythonEnv $cli knowledge verify --workspace $knowledgeRoot
+$knowledgeConfig = Join-Path $knowledgeRoot 'knowledge.json'
+```
+
+build 只将明确接受的案例写入版本化本地案例文件，自动生成路径、SHA-256 和家族身份登记。verify 显示 ready_for_prepare=true 后，将 knowledgeConfig 传给现有 prepare。新论文模式排除目标自身及同家族案例；只用一个家族建库，再分析同家族论文时，可能没有可用的其他家族参考。已知旧报告的修订稿应明确使用历史差分模式。
+
+也可以在对话中请求：
+
+```text
+$academic-aigc-precheck-portable
+为“<本地论文及报告文件夹>”建立本地知识库，输出到“<新私有知识目录>”。
+使用“<Python完整路径>”，仅查看该文件夹直属文件，确认每一对论文与报告及其家族。
+先生成候选和复核页面，实际核查后再加入知识库，无法确认的案例保留未知或跳过。
+最后生成并校验 knowledge.json，不上传我的论文、报告或案例。
+```
+
+已有兼容的 portable-knowledge-1 配置仍可通过 --knowledge 使用。若需要手工配置，原[JSON模板](.agents/skills/academic-aigc-precheck-portable/config.example.json)继续提供；root、cases_file、rules_file 和哈希必须与本机真实文件对应。完整格式及复核说明见 [local-knowledge.md](.agents/skills/academic-aigc-precheck-portable/references/local-knowledge.md)。
 
 ## 在对话中使用
 
@@ -231,11 +231,11 @@ $cli = Join-Path $installedSkill 'scripts\precheck.py'
 
 后续案例库将优先考虑已经公开且允许分享相关文本的论文，以及贡献者有权分享的真实检测记录。每条候选案例应登记论文来源与版本、报告时间、对应原文和上下文、真实高亮状态、可追溯证据及分享范围。原文、高亮证据和版本无法可靠对应时，应保留未知，不能根据语言风格编造标签。
 
-社区可以通过 Issue 或 Pull Request 参与程序修复、资料规范和案例审查。请先说明可公开的材料范围，再提交获准分享的内容；未发表原稿、账号信息和完整私有报告不应直接放入公开讨论或附件。合成示例只用于工程测试，不作为真实检测经验。新增案例在审核和版本登记后再纳入候选知识包，保留正例、反例及失败记录；当前尚未实现自动贡献导入或自动训练功能。
+社区可以通过 Issue 或 Pull Request 参与程序修复、资料规范和案例审查。请先说明可公开的材料范围，再提交获准分享的内容；未发表原稿、账号信息和完整私有报告不应直接放入公开讨论或附件。合成示例只用于工程测试，不作为真实检测经验。新增案例在审核和版本登记后再纳入候选知识包，保留正例、反例及失败记录。当前支持本地导入与复核，不会自动接受社区提交或训练模型。
 
 ## 当前工程验证与准确性边界
 
-当前冻结版本已经验证仓库外运行、用户级 Codex 发现、独立 Python 模块加载、PDF / DOCX / PDF+TeX 输入、两种模式准备、显式私有知识读取，以及 `finish` 的输入绑定、引文和报告校验。发布与本机安装阶段完整测试结果为 **403 passed，1 xfailed**；这些结果说明对应工程检查通过。
+既有版本已验证仓库外运行、用户级 Codex 发现、独立 Python 模块加载、PDF / DOCX / PDF+TeX 输入、两种模式准备、显式私有知识读取，以及 `finish` 的输入绑定、引文和报告校验。原有测试为 **403 passed，1 xfailed**；本次新增本地建库测试 **27 passed**，并从实际0.2.0 ZIP在研发仓库外安装，完成15条命令的合成建库和预检工程验收。所有模拟材料都标记 ENGINEERING_TEST_ONLY，没有重新预测真实论文。测试说明对应工程检查通过，不代表预测准确性。
 
 文档级预测已有少量真实报告对照，仍存在明显低估、局部误报和遗漏；同一家族不同版本的经验也不能直接推广到新论文。主观范围没有统计置信度保证，接近某一次官方比例也不能证明局部解释正确。全新环境下宿主自主完成整条工作流，以及跨论文预测准确性，仍需继续验证。
 
@@ -267,3 +267,14 @@ PDF 的双栏与公式可能影响阅读顺序，TeX 与 PDF 可能存在版本�
 ```
 
 卸载只移除经过校验的 Skill 文件，不删除私有知识、原论文或报告。专用 Python 环境和私有配置如需清理，应在确认目录身份后单独处理。
+
+## 开发测试
+
+公开仓库 tests/ 包含27项本地知识库合成测试，不依赖开发者私有论文。原研发403项测试包含本地研究资产，未随公开包分发。
+
+```powershell
+python -m pip install -r .agents/skills/academic-aigc-precheck-portable/requirements.txt -r requirements-dev.txt
+python -m pytest -q tests
+```
+
+这些测试不调用真实检测服务或模型 API。合成报告和标签仅用于工程检查，不能作为真实检测经验。最新安装包见 [0.2.0 发布页](https://github.com/LACANIA/academic-aigc-predictor/releases/tag/v0.2.0)。

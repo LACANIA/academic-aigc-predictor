@@ -19,7 +19,7 @@ def verify_archive(bundle):
         for n in names:checked(Path.cwd().resolve(),n)
         if 'MANIFEST.json' not in names:raise ValueError('Missing package manifest')
         m=json.loads(z.read('MANIFEST.json'))
-        if m.get('release')!='RC1-DOCX-PORTABLE-0.1.0':raise ValueError('Wrong release')
+        if m.get('release')!='RC1-DOCX-PORTABLE-0.2.0':raise ValueError('Wrong release')
         if set(names)!=set(m['files'])|{'MANIFEST.json'}:raise ValueError('Whitelist mismatch')
         data={n:z.read(n) for n in names}
         if any(hashlib.sha256(data[n]).hexdigest()!=h for n,h in m['files'].items()):raise ValueError('Package hash mismatch')
